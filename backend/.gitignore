@@ -13,6 +13,10 @@ dist-ssr
 .package-lock.json
 .env
 .node_modules
+node_modules
+package-lock.json
+package.json
+
 
 
 # Editor directories and files
