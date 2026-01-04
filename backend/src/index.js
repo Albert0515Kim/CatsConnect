@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from 'express';
 import morgan from 'morgan';
+import cors from 'cors';
 import authRouter from './routers/authRouter.js';
 import profilesRouter from './routers/profilesRouter.js';
 import friendsRouter from './routers/friendsRouter.js';
@@ -8,25 +9,22 @@ import messagesRouter from './routers/messagesRouter.js';
 
 const app = express();
 const port = process.env.PORT || 4000;
-const allowedOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+const allowedOrigins = [
+  ...(process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(',').map(origin => origin.trim()) : []),
+  'http://localhost:5173'
+].filter(Boolean);
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl) and matching origins
+    const isAllowed = !origin || allowedOrigins.includes(origin);
+    return isAllowed ? callback(null, true) : callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+};
 
-  if (!origin || origin === allowedOrigin) {
-    res.header('Access-Control-Allow-Origin', origin || allowedOrigin);
-  }
-
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-
-  return next();
-});
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
 
