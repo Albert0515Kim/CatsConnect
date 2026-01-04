@@ -11,8 +11,7 @@ const AppContext = createContext(null);
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 const TOKEN_STORAGE_KEY = 'cc_access_token';
-const FALLBACK_AVATAR =
-  '/pfp.png';
+const FALLBACK_AVATAR = '/pfp.png';
 
 const mapProfile = (profile) => ({
   id: profile.id,
