@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProfileCard from '../components/ProfileCard';
@@ -15,11 +16,21 @@ function Home() {
     sendFriendRequest,
     outgoingRequests,
     friends,
+    isAuthenticated,
+    isAuthReady,
+    friendRequests,
   } = useAppContext();
   const currentUser = profiles.find((profile) => profile.id === currentUserId);
   const [searchTerm, setSearchTerm] = useState('');
   const [majorFilter, setMajorFilter] = useState('');
   const [yearFilter, setYearFilter] = useState('');
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (isAuthReady && !isAuthenticated && navigate) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, isAuthReady, navigate]);
 
   const filteredProfiles = useMemo(() => {
     return profiles.filter((profile) => {
@@ -52,7 +63,7 @@ function Home() {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                'dY?_'
+                'dY?_;'
               )}
             </span>
             <h1>Hello, {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Friend'}!</h1>
@@ -61,16 +72,13 @@ function Home() {
             <label htmlFor="search" className="flex flex-1 flex-col gap-2 text-sm font-medium text-slate-700">
               Search
               <div className="relative">
-                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  dY"?
-                </span>
                 <input
                   id="search"
                   type="search"
                   placeholder="Search"
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
-                  className="w-full rounded-xl border border-slate-300 bg-white py-2 pl-10 pr-4 text-base text-slate-700 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+                  className="w-full rounded-xl border border-slate-300 bg-white py-2 px-4 text-base text-slate-700 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
                 />
               </div>
             </label>
@@ -111,6 +119,7 @@ function Home() {
                 onAddFriend={sendFriendRequest}
                 isRequested={outgoingRequests.includes(profile.id)}
                 isFriend={friends.includes(profile.id)}
+                isIncomingRequest={friendRequests.some((req) => req.requesterId === profile.id)}
               />
             ))}
           </div>

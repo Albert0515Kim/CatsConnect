@@ -1,12 +1,13 @@
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import Button from './Button';
 import Menu from './Menu';
 
 function Navbar() {
   const location = useLocation();
-  const { currentUserId, profiles } = useAppContext();
-  const isPublic = ['/', '/login', '/signup'].includes(location.pathname);
+  const navigate = useNavigate();
+  const { currentUserId, profiles, isAuthenticated, logout } = useAppContext();
+  const isPublicPath = ['/', '/login', '/signup'].includes(location.pathname);
   const currentUser = profiles.find((profile) => profile.id === currentUserId);
   const avatar = currentUser?.imageUrl;
 
@@ -16,7 +17,7 @@ function Navbar() {
         <Link to="/" className="text-2xl font-bold text-brand-700">
           CatsConnect
         </Link>
-        {isPublic ? (
+        {!isAuthenticated && isPublicPath ? (
           <div className="flex items-center gap-3">
             <Link to="/login">
               <Button variant="outline">Log in</Button>
@@ -55,7 +56,13 @@ function Navbar() {
                 },
                 { label: 'Settings', href: '/profile/edit' },
                 { label: 'Dark/Light Mode' },
-                { label: 'Sign Out', href: '/login' },
+                {
+                  label: 'Sign Out',
+                  onClick: () => {
+                    logout();
+                    navigate('/');
+                  },
+                },
               ]}
             >
               {avatar ? (

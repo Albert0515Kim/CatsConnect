@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
@@ -13,7 +13,8 @@ const clubs = ['DISC', 'Basketball', 'Field Hockey', 'Hack Club', 'Design Collec
 
 function EditProfile() {
   const navigate = useNavigate();
-  const { profiles, currentUserId, updateProfile, uploadProfileImage } = useAppContext();
+  const { profiles, currentUserId, updateProfile, uploadProfileImage, isAuthenticated, isAuthReady } =
+    useAppContext();
   const currentUser = profiles.find((profile) => profile.id === currentUserId);
 
   const [formState, setFormState] = useState({
@@ -25,15 +26,40 @@ function EditProfile() {
     major2: currentUser?.major2 || '',
     about: currentUser?.about || '',
     dorm: currentUser?.dorm || dorms[0],
-    clubs: currentUser?.clubs?.[0] || clubs[0],
+    clubs: currentUser?.clubs || [],
   });
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(currentUser?.imageUrl || null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isClubsOpen, setIsClubsOpen] = useState(false);
+  const [removeAvatar, setRemoveAvatar] = useState(false);
+
+  useEffect(() => {
+    if (isAuthReady && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, isAuthReady, navigate]);
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormState((prev) => ({ ...prev, [name]: value }));
+    const { name, value, multiple, options } = event.target;
+    if (multiple) {
+      const selected = Array.from(options)
+        .filter((opt) => opt.selected)
+        .map((opt) => opt.value);
+      setFormState((prev) => ({ ...prev, [name]: selected }));
+    } else {
+      setFormState((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const toggleClub = (club) => {
+    setFormState((prev) => {
+      const exists = prev.clubs.includes(club);
+      const clubsArray = exists
+        ? prev.clubs.filter((item) => item !== club)
+        : [...prev.clubs, club];
+      return { ...prev, clubs: clubsArray };
+    });
   };
 
   const handleFileChange = (event) => {
@@ -41,10 +67,17 @@ function EditProfile() {
     if (file) {
       setAvatarFile(file);
       setAvatarPreview(URL.createObjectURL(file));
+      setRemoveAvatar(false);
     } else {
       setAvatarFile(null);
       setAvatarPreview(currentUser?.imageUrl || null);
     }
+  };
+
+  const handleRemoveAvatar = () => {
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    setRemoveAvatar(true);
   };
 
   const handleSubmit = async (event) => {
@@ -58,7 +91,7 @@ function EditProfile() {
 
       await updateProfile({
         ...formState,
-        clubs: [formState.clubs],
+        ...(removeAvatar ? { imageUrl: null } : {}),
         ...(imageUrl ? { imageUrl } : {}),
       });
       navigate(`/profile/${currentUserId}`);
@@ -103,7 +136,18 @@ function EditProfile() {
               Change
             </span>
           </label>
-          <p className="text-sm text-slate-500">Upload a square image for best results.</p>
+          <div className="flex items-center gap-3">
+            <p className="text-sm text-slate-500">Upload a square image for best results.</p>
+            {avatarPreview && (
+              <button
+                type="button"
+                onClick={handleRemoveAvatar}
+                className="text-sm font-semibold text-red-600 hover:text-red-700"
+              >
+                Remove photo
+              </button>
+            )}
+          </div>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
           <TextInput
@@ -194,19 +238,45 @@ function EditProfile() {
               </option>
             ))}
           </Select>
-          <Select
-            label="Clubs/Activities"
-            id="clubs"
-            name="clubs"
-            value={formState.clubs}
-            onChange={handleChange}
-          >
-            {clubs.map((club) => (
-              <option key={club} value={club}>
-                {club}
-              </option>
-            ))}
-          </Select>
+          <div className="flex flex-col gap-2 text-sm font-medium text-slate-700">
+            <span>Clubs/Activities</span>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsClubsOpen((prev) => !prev)}
+                className="flex w-full items-center justify-between rounded-xl border border-slate-300 bg-white px-4 py-2 text-left text-base text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+              >
+                {formState.clubs.length === 0 ? 'Select clubs' : formState.clubs.join(', ')}
+                <span className="text-slate-400">▾</span>
+              </button>
+              {isClubsOpen ? (
+                <div className="absolute z-10 mt-2 w-full rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
+                  <div className="max-h-48 space-y-1 overflow-y-auto">
+                    {clubs.map((club) => {
+                      const checked = formState.clubs.includes(club);
+                      return (
+                        <label
+                          key={club}
+                          className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        >
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4"
+                            checked={checked}
+                            onChange={() => toggleClub(club)}
+                          />
+                          <span>{club}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            <span className="text-xs font-normal text-slate-500">
+              Choose all that apply.
+            </span>
+          </div>
         </div>
         <div className="flex flex-col gap-4 md:flex-row md:justify-between">
           <Button type="button" variant="ghost" className="px-10" onClick={() => navigate(-1)}>

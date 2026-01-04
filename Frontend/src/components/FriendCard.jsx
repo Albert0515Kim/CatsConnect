@@ -25,12 +25,11 @@ function FriendCard({ profile, onMessage, onRemove }) {
           </div>
           <Menu
             ariaLabel="Open friend actions"
-            buttonClassName="flex h-8 w-8 items-center justify-center rounded-full text-xl text-brand-700 hover:bg-slate-100"
+            buttonClassName="flex h-8 w-8 items-center justify-center rounded-full text-xl text-brand-700"
             items={[
               { label: 'View Profile', href: `/profile/${profile.id}` },
               { label: 'Message', onClick: () => onMessage(profile.id) },
               { label: 'Remove Friend', onClick: () => onRemove?.(profile.id) },
-              { label: 'Block' },
             ]}
           >
             <span aria-hidden="true">...</span>

@@ -1,4 +1,5 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
@@ -12,12 +13,46 @@ function Profile() {
     sendFriendRequest,
     friends,
     outgoingRequests,
+    fetchUserFriends,
+    isAuthenticated,
+    isAuthReady,
+    friendRequests,
   } = useAppContext();
+  const navigate = useNavigate();
   const resolvedId = id === 'me' ? currentUserId : id;
   const profile = profiles.find((person) => person.id === resolvedId);
   const isSelf = resolvedId === currentUserId;
   const isFriend = friends.includes(resolvedId);
   const isRequested = outgoingRequests.includes(resolvedId);
+  const isIncomingRequest = friendRequests.some((req) => req.requesterId === resolvedId);
+  const [profileFriendIds, setProfileFriendIds] = useState([]);
+
+  useEffect(() => {
+    const loadFriends = async () => {
+      if (!profile?.id) {
+        setProfileFriendIds([]);
+        return;
+      }
+      if (isSelf) {
+        setProfileFriendIds(friends);
+        return;
+      }
+      const ids = await fetchUserFriends(profile.id);
+      setProfileFriendIds(ids);
+    };
+    loadFriends();
+  }, [profile?.id, isSelf, friends, fetchUserFriends, profile, currentUserId]);
+
+  useEffect(() => {
+    if (isAuthReady && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, isAuthReady, navigate]);
+
+  const profileFriends = useMemo(
+    () => profiles.filter((person) => profileFriendIds.includes(person.id)),
+    [profiles, profileFriendIds],
+  );
 
   if (!profile) {
     return (
@@ -39,8 +74,16 @@ function Profile() {
           <div className="rounded-3xl bg-brand-50 p-8 shadow-md">
             <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-4">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-600 text-3xl text-white">
-                  🐾
+                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-3xl text-white">
+                  {profile.imageUrl ? (
+                    <img
+                      src={profile.imageUrl}
+                      alt={`${profile.firstName} ${profile.lastName}`}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    'dY?_'
+                  )}
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold text-slate-900">
@@ -60,9 +103,15 @@ function Profile() {
                   variant="green"
                   className="px-6 py-3 text-base"
                   onClick={() => sendFriendRequest(profile.id)}
-                  disabled={isFriend || isRequested}
+                  disabled={isFriend || isRequested || isIncomingRequest}
                 >
-                  {isFriend ? 'Friends' : isRequested ? 'Requested' : 'Add Friend'}
+                  {isFriend
+                    ? 'Friends'
+                    : isRequested
+                      ? 'Requested'
+                      : isIncomingRequest
+                        ? 'Incoming Request'
+                        : 'Add Friend'}
                 </Button>
               )}
             </div>
@@ -104,11 +153,15 @@ function Profile() {
             <div className="rounded-3xl bg-brand-50 p-8 shadow-md">
               <h3 className="text-2xl font-bold text-brand-700">Friends</h3>
               <div className="mt-4 space-y-4">
-                {profiles
-                  .filter((person) => friends.includes(person.id))
-                  .slice(0, 2)
-                  .map((friend) => (
-                    <div key={friend.id} className="flex items-center gap-3">
+                {profileFriends.length === 0 ? (
+                  <p className="text-sm text-slate-600">No friends to display.</p>
+                ) : (
+                  profileFriends.slice(0, 4).map((friend) => (
+                    <Link
+                      key={friend.id}
+                      to={`/profile/${friend.id}`}
+                      className="flex items-center gap-3 rounded-xl p-2 transition hover:bg-brand-50"
+                    >
                       <img
                         src={friend.imageUrl}
                         alt={`${friend.firstName} ${friend.lastName}`}
@@ -120,8 +173,9 @@ function Profile() {
                         </p>
                         <p className="text-sm text-slate-600">@{friend.username}</p>
                       </div>
-                    </div>
-                  ))}
+                    </Link>
+                  ))
+                )}
               </div>
             </div>
           </div>

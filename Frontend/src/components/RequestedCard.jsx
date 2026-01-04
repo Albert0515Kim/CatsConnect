@@ -25,13 +25,13 @@ function RequestedCard({ profile, onCancel }) {
           </div>
           <Menu
             ariaLabel="Open requested actions"
-            buttonClassName="flex h-8 w-8 items-center justify-center rounded-full text-xl text-brand-700 hover:bg-slate-100"
+            buttonClassName="flex h-9 w-9 items-center justify-center rounded-full text-lg text-brand-700"
             items={[
               { label: 'View Profile', href: `/profile/${profile.id}` },
               { label: 'Cancel Request', onClick: () => onCancel?.(profile.id) },
             ]}
           >
-            ?
+            <span aria-hidden="true" className="leading-none">...</span>
           </Menu>
         </div>
         <div className="flex flex-wrap gap-2 text-xs text-slate-600">
@@ -42,8 +42,12 @@ function RequestedCard({ profile, onCancel }) {
         </div>
       </CardBody>
       <CardFooter>
-        <Button variant="outline" className="w-full" onClick={() => onCancel?.(profile.id)}>
-          Cancel Request
+        <Button
+          variant="outline"
+          className="w-full cursor-not-allowed opacity-80"
+          disabled
+        >
+          Requested
         </Button>
       </CardFooter>
     </Card>

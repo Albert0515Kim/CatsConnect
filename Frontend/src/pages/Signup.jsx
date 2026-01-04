@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
@@ -17,7 +17,7 @@ const years = ['2025', '2026', '2027', '2028', '2029'];
 
 function Signup() {
   const navigate = useNavigate();
-  const { signup } = useAppContext();
+  const { signup, isAuthenticated } = useAppContext();
   const [formState, setFormState] = useState({
     email: '',
     password: '',
@@ -33,6 +33,12 @@ function Signup() {
     const { name, value } = event.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/home');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();

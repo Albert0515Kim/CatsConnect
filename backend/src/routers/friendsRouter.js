@@ -5,6 +5,7 @@ import {
   declineFriendRequest,
   listFriendRequests,
   listFriends,
+  listUserFriends,
   removeFriend,
   sendFriendRequest,
 } from '../controllers/friendsController.js';
@@ -13,6 +14,7 @@ import { requireAuth } from '../middleware/auth.js';
 const router = express.Router();
 
 router.get('/', requireAuth, listFriends);
+router.get('/user/:userId', requireAuth, listUserFriends);
 router.get('/requests', requireAuth, listFriendRequests);
 router.post('/requests', requireAuth, sendFriendRequest);
 router.post('/requests/:requestId/accept', requireAuth, acceptFriendRequest);

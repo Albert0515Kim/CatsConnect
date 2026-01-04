@@ -26,7 +26,7 @@ const mapProfile = (profile) => ({
   dorm: profile.dorm ?? '',
   clubs: profile.clubs ?? [],
   about: profile.about ?? '',
-  imageUrl: profile.image_url ?? profile.imageUrl ?? FALLBACK_AVATAR,
+  imageUrl: profile.image_url || profile.imageUrl || FALLBACK_AVATAR,
 });
 
 const buildProfileUpdatePayload = (data) => {
@@ -338,7 +338,12 @@ export function AppProvider({ children }) {
         !recipientId ||
         recipientId === currentUserId ||
         friends.includes(recipientId) ||
-        outgoingRequests.includes(recipientId)
+        outgoingRequests.includes(recipientId) ||
+        friendRequests.some(
+          (request) =>
+            request.requesterId === recipientId &&
+            (!request.status || request.status === 'pending'),
+        )
       ) {
         return;
       }
@@ -407,6 +412,21 @@ export function AppProvider({ children }) {
     [request, refreshRequests],
   );
 
+  const fetchUserFriends = useCallback(
+    async (userId) => {
+      if (!userId) {
+        return [];
+      }
+      const { friends: friendIds } = await request(`/api/friends/user/${userId}`);
+      return friendIds;
+    },
+    [request],
+  );
+
+  const logout = useCallback(() => {
+    clearSession();
+  }, [clearSession]);
+
   const isAuthenticated = Boolean(token);
 
   const contextValue = useMemo(
@@ -430,6 +450,8 @@ export function AppProvider({ children }) {
       declineFriendRequest,
       refreshFriends,
       refreshRequests,
+      fetchUserFriends,
+      logout,
       isAuthenticated,
       isAuthReady,
     }),
@@ -452,6 +474,8 @@ export function AppProvider({ children }) {
       declineFriendRequest,
       refreshFriends,
       refreshRequests,
+      fetchUserFriends,
+      logout,
       isAuthenticated,
       isAuthReady,
     ],

@@ -36,7 +36,7 @@ function Menu({
     <div className="relative" ref={containerRef}>
       <button
         type="button"
-        className={buttonClassName}
+        className={`inline-flex items-center justify-center leading-none text-center ${buttonClassName}`}
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label={ariaLabel}

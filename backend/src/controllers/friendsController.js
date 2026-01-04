@@ -31,6 +31,25 @@ export async function listFriends(req, res) {
   return res.status(200).json({ friends: data.map((row) => row.friend_id) });
 }
 
+export async function listUserFriends(req, res) {
+  const { userId } = req.params;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'userId is required.' });
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('friendships')
+    .select('friend_id')
+    .eq('user_id', userId);
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  return res.status(200).json({ friends: data.map((row) => row.friend_id) });
+}
+
 export async function sendFriendRequest(req, res) {
   const { user } = req;
   const { recipientId } = req.body;
@@ -79,6 +98,8 @@ export async function acceptFriendRequest(req, res) {
     return res.status(400).json({ error: friendshipError.message });
   }
 
+  await supabaseAdmin.from('friend_requests').delete().eq('id', request.id);
+
   return res.status(200).json({ request });
 }
 
@@ -88,7 +109,7 @@ export async function declineFriendRequest(req, res) {
 
   const { data, error } = await supabaseAdmin
     .from('friend_requests')
-    .update({ status: 'declined' })
+    .delete()
     .eq('id', requestId)
     .eq('recipient_id', user.id)
     .select('*')
@@ -135,8 +156,7 @@ export async function cancelFriendRequest(req, res) {
     .from('friend_requests')
     .delete()
     .eq('requester_id', user.id)
-    .eq('recipient_id', recipientId)
-    .eq('status', 'pending');
+    .eq('recipient_id', recipientId);
 
   if (error) {
     return res.status(400).json({ error: error.message });

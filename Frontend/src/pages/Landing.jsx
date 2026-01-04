@@ -1,10 +1,20 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
-
+import { useAppContext } from '../context/AppContext';
 
 function Landing() {
+  const navigate = useNavigate();
+  const { isAuthenticated, isAuthReady } = useAppContext();
+
+  useEffect(() => {
+    if (isAuthReady && isAuthenticated) {
+      navigate('/home');
+    }
+  }, [isAuthenticated, isAuthReady, navigate]);
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
@@ -13,7 +23,7 @@ function Landing() {
           <div className="order-2 md:order-1">
             <div className="overflow-hidden rounded-3xl shadow-md">
               <img
-                src= '/landing.jpg'
+                src="/landing.jpg"
                 alt="Northwestern campus"
                 className="h-full w-full object-cover"
               />
@@ -23,10 +33,10 @@ function Landing() {
             <h1 className="text-4xl font-bold text-brand-700 md:text-5xl">
               Connect With Cats on Campus
             </h1>
-            <p className="text-lg text-slate-600">
+            <p className="text-lg text-slate-600 ">
               Connect with fellow Wildcats on campus. Discover students, make connections, and build friendships.
             </p>
-            <Link to="/signup">
+            <Link to="/signup" className="inline-block mt-2">
               <Button variant="green" className="px-8 py-3 text-base">
                 Get started
               </Button>

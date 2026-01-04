@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -19,6 +19,8 @@ function Friends() {
     declineFriendRequest,
     cancelFriendRequest,
     removeFriend,
+    isAuthenticated,
+    isAuthReady,
   } = useAppContext();
 
   const friendProfiles = useMemo(
@@ -65,6 +67,12 @@ function Friends() {
   const handleRemove = async (profileId) => {
     await removeFriend(profileId);
   };
+
+  useEffect(() => {
+    if (isAuthReady && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, isAuthReady, navigate]);
 
   return (
     <div className="flex min-h-screen flex-col">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
@@ -7,11 +7,17 @@ import { useAppContext } from '../context/AppContext';
 
 function Login() {
   const navigate = useNavigate();
-  const { login } = useAppContext();
+  const { login, isAuthenticated } = useAppContext();
   const [formState, setFormState] = useState({
     email: '',
     password: '',
   });
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/home');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
