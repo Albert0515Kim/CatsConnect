@@ -11,6 +11,8 @@ const app = express();
 const port = process.env.PORT || 4000;
 const allowedOrigins = [
   ...(process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(',').map(origin => origin.trim()) : []),
+  'https://catsconnect.web.app',
+  'https://catsconnect-falb2.web.app',
   'http://localhost:5173'
 ].filter(Boolean);
 
