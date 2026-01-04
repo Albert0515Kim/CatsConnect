@@ -80,7 +80,7 @@ function EditProfile() {
           onClick={() => navigate(-1)}
           aria-label="Close"
         >
-          バ
+          &times;
         </button>
       )}
     >

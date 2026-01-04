@@ -56,6 +56,14 @@ export async function uploadProfileImage(req, res) {
   const fileExt = path.extname(file.originalname) || '.jpg';
   const filePath = `${user.id}/${Date.now()}${fileExt}`;
 
+   // Ensure bucket exists (idempotent)
+   const { error: bucketError } = await supabaseAdmin.storage.createBucket(avatarBucket, {
+     public: true,
+   });
+   if (bucketError && !bucketError.message?.includes('already exists')) {
+     return res.status(400).json({ error: bucketError.message });
+   }
+
   const { error: uploadError } = await supabaseAdmin.storage
     .from(avatarBucket)
     .upload(filePath, file.buffer, {

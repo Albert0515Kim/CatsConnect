@@ -31,6 +31,7 @@ export async function signup(req, res) {
     major1: major1 || null,
     major2: major2 || null,
     grad_year: gradYear || null,
+    image_url: '/pfp.png',
   };
 
   const { error: profileError } = await supabaseAdmin.from('profiles').upsert(profilePayload);

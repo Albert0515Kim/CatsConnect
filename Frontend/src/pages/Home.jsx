@@ -44,8 +44,16 @@ function Home() {
       <main className="flex-1">
         <div className="mx-auto w-full max-w-6xl px-6 py-10">
           <div className="flex flex-wrap items-center gap-4 text-3xl font-bold text-slate-900">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-600 text-white">
-              🐾
+            <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white">
+              {currentUser?.imageUrl ? (
+                <img
+                  src={currentUser.imageUrl}
+                  alt="Profile"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                'dY?_'
+              )}
             </span>
             <h1>Hello, {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Friend'}!</h1>
           </div>
@@ -54,7 +62,7 @@ function Home() {
               Search
               <div className="relative">
                 <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  🔍
+                  dY"?
                 </span>
                 <input
                   id="search"
