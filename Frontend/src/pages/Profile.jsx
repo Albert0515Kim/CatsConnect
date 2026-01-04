@@ -121,7 +121,7 @@ function Profile() {
             <h2 className="text-2xl font-bold text-brand-700">About Me</h2>
             <p className="mt-3 text-slate-700">
               {profile.about ||
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam mi felis, tristique ac eleifend nec.'}
+                }
             </p>
           </div>
 
