@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import Button from './Button';
 import Card, { CardBody, CardFooter, CardMedia } from './Card';
 import Menu from './Menu';
@@ -5,10 +6,14 @@ import Menu from './Menu';
 function RequestCard({ profile, onAccept, onDecline }) {
   return (
     <Card>
-      <CardMedia className="bg-brand-600">
-        <div className="flex h-full items-center justify-center text-white">
-          <span className="text-4xl">🐾</span>
-        </div>
+      <CardMedia>
+        <Link to={`/profile/${profile.id}`} className="block h-full w-full">
+          <img
+            src={profile.imageUrl}
+            alt={`${profile.firstName} ${profile.lastName}`}
+            className="h-full w-full object-cover"
+          />
+        </Link>
       </CardMedia>
       <CardBody>
         <div className="flex items-start justify-between gap-2">
@@ -20,15 +25,16 @@ function RequestCard({ profile, onAccept, onDecline }) {
           </div>
           <Menu
             ariaLabel="Open request actions"
-            buttonClassName="flex h-8 w-8 items-center justify-center rounded-full text-xl text-brand-700 hover:bg-slate-100"
+            buttonClassName="flex h-9 w-9 items-center justify-center rounded-full text-lg text-brand-700"
             items={[
               { label: 'View Profile', href: `/profile/${profile.id}` },
               { label: 'Accept', onClick: () => onAccept(profile.id) },
               { label: 'Decline', onClick: () => onDecline(profile.id) },
-              { label: 'Block' },
             ]}
           >
-            ⋯
+            <span aria-hidden="true" className="flex h-full w-full items-center justify-center leading-none">
+              ...
+            </span>
           </Menu>
         </div>
         <div className="flex flex-wrap gap-2 text-xs text-slate-600">

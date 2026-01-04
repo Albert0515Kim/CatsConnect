@@ -13,7 +13,7 @@ function SelectDropdown({ label, name, value, onChange, options, required = fals
         value={value}
         onChange={onChange}
         required={required}
-        className="w-full rounded-md border border-slate-300 bg-white px-3 py-3 text-base text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+        className="w-full rounded-md border border-slate-300 bg-white px-3 py-3 text-base text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200 "
       >
         <option value="">Select {label || 'an option'}</option>
         {options.map((option, index) => (

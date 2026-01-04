@@ -3,15 +3,26 @@ import Button from './Button';
 import Card, { CardBody, CardFooter, CardMedia } from './Card';
 import Menu from './Menu';
 
-function ProfileCard({ profile, onAddFriend, isRequested = false, isFriend = false }) {
-  const isActionDisabled = isRequested || isFriend;
-  const actionLabel = isFriend ? 'Friends' : isRequested ? 'Requested' : 'Add Friend';
+function ProfileCard({
+  profile,
+  onAddFriend,
+  isRequested = false,
+  isFriend = false,
+  isIncomingRequest = false,
+}) {
+  const isActionDisabled = isRequested || isFriend || isIncomingRequest;
+  const actionLabel = isFriend
+    ? 'Friends'
+    : isRequested
+      ? 'Requested'
+      : isIncomingRequest
+        ? 'Incoming Request'
+        : 'Add Friend';
   const actionVariant = isActionDisabled ? 'ghost' : 'green';
   const menuItems = [{ label: 'View Profile', href: `/profile/${profile.id}` }];
   if (!isActionDisabled) {
     menuItems.push({ label: 'Add Friend', onClick: () => onAddFriend(profile.id) });
   }
-  menuItems.push({ label: 'Block' });
 
   return (
     <Card>
@@ -34,10 +45,10 @@ function ProfileCard({ profile, onAddFriend, isRequested = false, isFriend = fal
           </div>
           <Menu
             ariaLabel="Open profile actions"
-            buttonClassName="flex h-8 w-8 items-center justify-center rounded-full text-xl text-brand-700 hover:bg-slate-100"
+            buttonClassName="flex h-8 w-8 items-center justify-center rounded-full text-xl text-brand-700"
             items={menuItems}
           >
-            ⋯
+            ...
           </Menu>
         </div>
         <div className="flex flex-wrap gap-2 text-xs text-slate-600">

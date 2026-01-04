@@ -3,7 +3,7 @@ import Button from './Button';
 import Card, { CardBody, CardFooter, CardMedia } from './Card';
 import Menu from './Menu';
 
-function FriendCard({ profile, onMessage }) {
+function FriendCard({ profile, onMessage, onRemove }) {
   return (
     <Card>
       <CardMedia>
@@ -25,14 +25,14 @@ function FriendCard({ profile, onMessage }) {
           </div>
           <Menu
             ariaLabel="Open friend actions"
-            buttonClassName="flex h-8 w-8 items-center justify-center rounded-full text-xl text-brand-700 hover:bg-slate-100"
+            buttonClassName="flex h-8 w-8 items-center justify-center rounded-full text-xl text-brand-700"
             items={[
               { label: 'View Profile', href: `/profile/${profile.id}` },
               { label: 'Message', onClick: () => onMessage(profile.id) },
-              { label: 'Block' },
+              { label: 'Remove Friend', onClick: () => onRemove?.(profile.id) },
             ]}
           >
-            ⋯
+            <span aria-hidden="true">...</span>
           </Menu>
         </div>
         <div className="flex flex-wrap gap-2 text-xs text-slate-600">

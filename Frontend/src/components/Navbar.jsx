@@ -1,13 +1,15 @@
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import Button from './Button';
 import Menu from './Menu';
 
 function Navbar() {
   const location = useLocation();
-  const { currentUserId, profiles } = useAppContext();
+  const navigate = useNavigate();
+  const { currentUserId, profiles, isAuthenticated, logout } = useAppContext();
+  const isPublicPath = ['/', '/login', '/signup'].includes(location.pathname);
   const currentUser = profiles.find((profile) => profile.id === currentUserId);
-  const isPublic = ['/', '/login', '/signup'].includes(location.pathname);
+  const avatar = currentUser?.imageUrl;
 
   return (
     <nav className="border-b border-slate-200 bg-white">
@@ -15,7 +17,7 @@ function Navbar() {
         <Link to="/" className="text-2xl font-bold text-brand-700">
           CatsConnect
         </Link>
-        {isPublic ? (
+        {!isAuthenticated && isPublicPath ? (
           <div className="flex items-center gap-3">
             <Link to="/login">
               <Button variant="outline">Log in</Button>
@@ -46,7 +48,7 @@ function Navbar() {
             </NavLink>
             <Menu
               ariaLabel="Open profile menu"
-              buttonClassName="flex h-10 w-10 items-center justify-center rounded-full overflow-hidden"
+              buttonClassName="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white"
               items={[
                 {
                   label: 'My Profile',
@@ -54,17 +56,19 @@ function Navbar() {
                 },
                 { label: 'Settings', href: '/profile/edit' },
                 { label: 'Dark/Light Mode' },
-                { label: 'Sign Out', href: '/login' },
+                {
+                  label: 'Sign Out',
+                  onClick: () => {
+                    logout();
+                    navigate('/');
+                  },
+                },
               ]}
             >
-              {currentUser?.imageUrl ? (
-                <img
-                  src={currentUser.imageUrl}
-                  alt="Profile"
-                  className="h-full w-full object-cover"
-                />
+              {avatar ? (
+                <img src={avatar} alt="Profile" className="h-full w-full object-cover" />
               ) : (
-                <span className="text-lg">🐾</span>
+                <span className="text-lg">dY?_</span>
               )}
             </Menu>
           </div>

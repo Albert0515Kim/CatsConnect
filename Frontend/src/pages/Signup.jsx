@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
@@ -17,7 +17,7 @@ const years = ['2025', '2026', '2027', '2028', '2029'];
 
 function Signup() {
   const navigate = useNavigate();
-  const { signup } = useAppContext();
+  const { signup, isAuthenticated } = useAppContext();
   const [formState, setFormState] = useState({
     email: '',
     password: '',
@@ -34,19 +34,29 @@ function Signup() {
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/home');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    signup(formState);
-    navigate('/home');
+    try {
+      await signup(formState);
+      navigate('/home');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <PageShell
-      title="Create your account"
+ title="Create your account"
       subtitle="Start building your profile in minutes."
       maxWidth="max-w-3xl"
       sideTitle="Meet your next study crew"
-      sideCopy="Set up your basics so we can recommend Set up your basics so you can start finding classmates and others similar to you!"
+      sideCopy="Set up your basics so you can start finding classmates and others similar to you!"
       sideItems={['Find like-minded individuals', 'Find common activities and clubs', 'Access to student chats']}
       sideIcon="📚"
     >

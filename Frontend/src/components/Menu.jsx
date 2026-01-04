@@ -36,7 +36,7 @@ function Menu({
     <div className="relative" ref={containerRef}>
       <button
         type="button"
-        className={buttonClassName}
+        className={`inline-flex items-center justify-center leading-none text-center ${buttonClassName}`}
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label={ariaLabel}
@@ -46,7 +46,7 @@ function Menu({
       </button>
       {isOpen ? (
         <div
-          className={`absolute z-20 mt-2 min-w-[10rem] rounded-xl border border-slate-200 bg-white p-2 text-sm shadow-lg ${alignmentClass} ${menuClassName}`}
+          className={`absolute z-40 mt-2 min-w-[10rem] rounded-xl border border-slate-200 bg-white p-2 text-sm shadow-lg ${alignmentClass} ${menuClassName}`}
           role="menu"
         >
           <div className="flex flex-col gap-1">

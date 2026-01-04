@@ -1,9 +1,24 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAppContext } from '../context/AppContext';
 
 function Messages() {
-  const { profiles, friends, selectedConversationId, setSelectedConversationId } = useAppContext();
+  const {
+    profiles,
+    friends,
+    selectedConversationId,
+    setSelectedConversationId,
+    isAuthenticated,
+    isAuthReady,
+  } = useAppContext();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (isAuthReady && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, isAuthReady, navigate]);
   const friendProfiles = profiles.filter((profile) => friends.includes(profile.id));
   const selectedFriend = friendProfiles.find((profile) => profile.id === selectedConversationId);
 
