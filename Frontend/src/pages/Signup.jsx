@@ -34,19 +34,23 @@ function Signup() {
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    signup(formState);
-    navigate('/home');
+    try {
+      await signup(formState);
+      navigate('/home');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <PageShell
-      title="Create your account"
+ title="Create your account"
       subtitle="Start building your profile in minutes."
       maxWidth="max-w-3xl"
       sideTitle="Meet your next study crew"
-      sideCopy="Set up your basics so we can recommend Set up your basics so you can start finding classmates and others similar to you!"
+      sideCopy="Set up your basics so you can start finding classmates and others similar to you!"
       sideItems={['Find like-minded individuals', 'Find common activities and clubs', 'Access to student chats']}
       sideIcon="📚"
     >

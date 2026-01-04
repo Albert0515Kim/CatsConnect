@@ -6,8 +6,9 @@ import Menu from './Menu';
 function Navbar() {
   const location = useLocation();
   const { currentUserId, profiles } = useAppContext();
-  const currentUser = profiles.find((profile) => profile.id === currentUserId);
   const isPublic = ['/', '/login', '/signup'].includes(location.pathname);
+  const currentUser = profiles.find((profile) => profile.id === currentUserId);
+  const avatar = currentUser?.imageUrl;
 
   return (
     <nav className="border-b border-slate-200 bg-white">
@@ -46,7 +47,7 @@ function Navbar() {
             </NavLink>
             <Menu
               ariaLabel="Open profile menu"
-              buttonClassName="flex h-10 w-10 items-center justify-center rounded-full overflow-hidden"
+              buttonClassName="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-white"
               items={[
                 {
                   label: 'My Profile',
@@ -57,14 +58,10 @@ function Navbar() {
                 { label: 'Sign Out', href: '/login' },
               ]}
             >
-              {currentUser?.imageUrl ? (
-                <img
-                  src={currentUser.imageUrl}
-                  alt="Profile"
-                  className="h-full w-full object-cover"
-                />
+              {avatar ? (
+                <img src={avatar} alt="Profile" className="h-full w-full object-cover" />
               ) : (
-                <span className="text-lg">🐾</span>
+                <span className="text-lg">dY?_</span>
               )}
             </Menu>
           </div>

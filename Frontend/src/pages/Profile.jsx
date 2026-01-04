@@ -6,11 +6,18 @@ import { useAppContext } from '../context/AppContext';
 
 function Profile() {
   const { id } = useParams();
-  const { profiles, currentUserId, sendFriendRequest, friends } = useAppContext();
+  const {
+    profiles,
+    currentUserId,
+    sendFriendRequest,
+    friends,
+    outgoingRequests,
+  } = useAppContext();
   const resolvedId = id === 'me' ? currentUserId : id;
   const profile = profiles.find((person) => person.id === resolvedId);
   const isSelf = resolvedId === currentUserId;
   const isFriend = friends.includes(resolvedId);
+  const isRequested = outgoingRequests.includes(resolvedId);
 
   if (!profile) {
     return (
@@ -53,9 +60,9 @@ function Profile() {
                   variant="green"
                   className="px-6 py-3 text-base"
                   onClick={() => sendFriendRequest(profile.id)}
-                  disabled={isFriend}
+                  disabled={isFriend || isRequested}
                 >
-                  {isFriend ? 'Friends' : 'Add Friend'}
+                  {isFriend ? 'Friends' : isRequested ? 'Requested' : 'Add Friend'}
                 </Button>
               )}
             </div>

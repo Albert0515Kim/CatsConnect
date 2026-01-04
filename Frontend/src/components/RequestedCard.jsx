@@ -3,7 +3,7 @@ import Button from './Button';
 import Card, { CardBody, CardFooter, CardMedia } from './Card';
 import Menu from './Menu';
 
-function RequestedCard({ profile }) {
+function RequestedCard({ profile, onCancel }) {
   return (
     <Card>
       <CardMedia>
@@ -26,9 +26,12 @@ function RequestedCard({ profile }) {
           <Menu
             ariaLabel="Open requested actions"
             buttonClassName="flex h-8 w-8 items-center justify-center rounded-full text-xl text-brand-700 hover:bg-slate-100"
-            items={[{ label: 'View Profile', href: `/profile/${profile.id}` }]}
+            items={[
+              { label: 'View Profile', href: `/profile/${profile.id}` },
+              { label: 'Cancel Request', onClick: () => onCancel?.(profile.id) },
+            ]}
           >
-            ⋯
+            ?
           </Menu>
         </div>
         <div className="flex flex-wrap gap-2 text-xs text-slate-600">
@@ -39,12 +42,8 @@ function RequestedCard({ profile }) {
         </div>
       </CardBody>
       <CardFooter>
-        <Button
-          variant="ghost"
-          className="w-full cursor-not-allowed opacity-70"
-          disabled
-        >
-          Requested
+        <Button variant="outline" className="w-full" onClick={() => onCancel?.(profile.id)}>
+          Cancel Request
         </Button>
       </CardFooter>
     </Card>

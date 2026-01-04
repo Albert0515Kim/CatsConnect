@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 
+
 function Landing() {
   return (
     <div className="flex min-h-screen flex-col">
@@ -12,7 +13,7 @@ function Landing() {
           <div className="order-2 md:order-1">
             <div className="overflow-hidden rounded-3xl shadow-md">
               <img
-                src="/landing.jpg"
+                src= '/landing.jpg'
                 alt="Northwestern campus"
                 className="h-full w-full object-cover"
               />

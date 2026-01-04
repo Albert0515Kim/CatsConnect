@@ -1,13 +1,19 @@
 function Card({ children, className = '' }) {
   return (
-    <div className={`flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-md ${className}`}>
+    <div
+      className={`relative flex h-full flex-col rounded-2xl bg-white shadow-md ${className}`}
+    >
       {children}
     </div>
   );
 }
 
 function CardMedia({ children, className = '' }) {
-  return <div className={`h-40 w-full overflow-hidden ${className}`}>{children}</div>;
+  return (
+    <div className={`h-40 w-full overflow-hidden rounded-t-2xl ${className}`}>
+      {children}
+    </div>
+  );
 }
 
 function CardBody({ children, className = '' }) {

@@ -18,10 +18,14 @@ function Login() {
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    login(formState.email, formState.password);
-    navigate('/home');
+    try {
+      await login(formState.email, formState.password);
+      navigate('/home');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

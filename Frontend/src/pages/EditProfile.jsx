@@ -13,7 +13,7 @@ const clubs = ['DISC', 'Basketball', 'Field Hockey', 'Hack Club', 'Design Collec
 
 function EditProfile() {
   const navigate = useNavigate();
-  const { profiles, currentUserId, updateProfile } = useAppContext();
+  const { profiles, currentUserId, updateProfile, uploadProfileImage } = useAppContext();
   const currentUser = profiles.find((profile) => profile.id === currentUserId);
 
   const [formState, setFormState] = useState({
@@ -27,19 +27,46 @@ function EditProfile() {
     dorm: currentUser?.dorm || dorms[0],
     clubs: currentUser?.clubs?.[0] || clubs[0],
   });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(currentUser?.imageUrl || null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    } else {
+      setAvatarFile(null);
+      setAvatarPreview(currentUser?.imageUrl || null);
+    }
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    updateProfile({
-      ...formState,
-      clubs: [formState.clubs],
-    });
-    navigate(`/profile/${currentUserId}`);
+    setIsSaving(true);
+    try {
+      let imageUrl;
+      if (avatarFile) {
+        imageUrl = await uploadProfileImage(avatarFile);
+      }
+
+      await updateProfile({
+        ...formState,
+        clubs: [formState.clubs],
+        ...(imageUrl ? { imageUrl } : {}),
+      });
+      navigate(`/profile/${currentUserId}`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -53,23 +80,30 @@ function EditProfile() {
           onClick={() => navigate(-1)}
           aria-label="Close"
         >
-          ✕
+          バ
         </button>
       )}
     >
       <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="flex justify-center">
-          {currentUser?.imageUrl ? (
-            <img
-              src={currentUser.imageUrl}
-              alt="Profile"
-              className="h-20 w-20 rounded-full object-cover"
+        <div className="flex flex-col items-center gap-3">
+          <label className="group relative flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-brand-100 shadow-sm transition hover:ring-2 hover:ring-brand-300">
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+              aria-label="Upload profile photo"
             />
-          ) : (
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-600 text-3xl text-white">
-              🐾
-            </div>
-          )}
+            {avatarPreview ? (
+              <img src={avatarPreview} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-3xl text-brand-700">dY?_</span>
+            )}
+            <span className="absolute inset-0 hidden items-center justify-center bg-black/40 text-sm font-semibold text-white group-hover:flex">
+              Change
+            </span>
+          </label>
+          <p className="text-sm text-slate-500">Upload a square image for best results.</p>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
           <TextInput
@@ -143,6 +177,9 @@ function EditProfile() {
               rows={4}
               className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-base text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
             />
+            <span className="text-xs font-normal text-slate-500">
+              Share a few interests or what you are looking for in a roommate.
+            </span>
           </label>
           <Select
             label="Dorm"
@@ -175,8 +212,8 @@ function EditProfile() {
           <Button type="button" variant="ghost" className="px-10" onClick={() => navigate(-1)}>
             Cancel
           </Button>
-          <Button type="submit" className="px-10">
-            Update Profile
+          <Button type="submit" className="px-10" disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Update Profile'}
           </Button>
         </div>
       </form>

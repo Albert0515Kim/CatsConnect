@@ -3,7 +3,7 @@ import Button from './Button';
 import Card, { CardBody, CardFooter, CardMedia } from './Card';
 import Menu from './Menu';
 
-function FriendCard({ profile, onMessage }) {
+function FriendCard({ profile, onMessage, onRemove }) {
   return (
     <Card>
       <CardMedia>
@@ -29,10 +29,11 @@ function FriendCard({ profile, onMessage }) {
             items={[
               { label: 'View Profile', href: `/profile/${profile.id}` },
               { label: 'Message', onClick: () => onMessage(profile.id) },
+              { label: 'Remove Friend', onClick: () => onRemove?.(profile.id) },
               { label: 'Block' },
             ]}
           >
-            ⋯
+            <span aria-hidden="true">...</span>
           </Menu>
         </div>
         <div className="flex flex-wrap gap-2 text-xs text-slate-600">
